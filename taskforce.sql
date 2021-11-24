@@ -7,14 +7,15 @@ CREATE TABLE `task` (
 	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`finish_at` datetime DEFAULT NULL,
 	`status` enum('new','canceled','in_work','failed','completed') NOT NULL DEFAULT 'new',
-	`latitude` decimal(8,6) DEFAULT NULL,
-	`longitude` decimal(8,6) DEFAULT NULL,
+    `budget` decimal(12,2) NOT NULL,
+    `latitude` decimal(10,7) DEFAULT NULL,
+    `longitude` decimal(10,7) DEFAULT NULL,
+    `address` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
 	`city_id` int UNSIGNED DEFAULT NULL,
 	PRIMARY KEY (`id`),
 	INDEX (`category_id`),
 	INDEX (`city_id`)
 );
-
 
 CREATE TABLE `category` (
 	`id` int UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -25,9 +26,9 @@ CREATE TABLE `category` (
 
 CREATE TABLE `user` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`name` TEXT NOT NULL,
-	`email` TEXT NOT NULL,
-	`password_hash` text NOT NULL,
+    `name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
+    `email` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
+    `password_hash` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
 	`register_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`city_id` INT UNSIGNED NOT NULL,
 	`avatar` TEXT DEFAULT NULL,
@@ -41,9 +42,10 @@ CREATE TABLE `user` (
     `is_notify_about_message` tinyint NOT NULL DEFAULT '0',
     `is_notify_about_action` tinyint NOT NULL DEFAULT '0',
     `is_notify_about_review` tinyint NOT NULL DEFAULT '0',
+    `about` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
 	PRIMARY KEY (`id`),
 	INDEX (`city_id`),
-	UNIQUE (`email`(512))
+	UNIQUE (`email`(128))
 );
 
 CREATE TABLE `response` (
@@ -61,8 +63,8 @@ CREATE TABLE `response` (
 CREATE TABLE `city` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` TEXT NOT NULL,
-	`latitude` DECIMAL(8,6) DEFAULT NULL,
-	`longitude` DECIMAL(8,6) DEFAULT NULL,
+    `latitude` DECIMAL(10,7) DEFAULT NULL,
+    `longitude` DECIMAL(10,7) DEFAULT NULL,
 	PRIMARY KEY (`id`)
 );
 
@@ -126,11 +128,11 @@ ALTER TABLE `task` ADD CONSTRAINT `task_fk1` FOREIGN KEY (`city_id`) REFERENCES 
 
 ALTER TABLE `user` ADD CONSTRAINT `user_fk0` FOREIGN KEY (`city_id`) REFERENCES `city`(`id`);
 
-ALTER TABLE `response` ADD CONSTRAINT `response_fk0` FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE;
+ALTER TABLE `response` ADD CONSTRAINT `response_fk0` FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE NO ACTION;
 
 ALTER TABLE `response` ADD CONSTRAINT `response_fk1` FOREIGN KEY (`worker_id`) REFERENCES `user`(`id`);
 
-ALTER TABLE `message` ADD CONSTRAINT `message_fk0` FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE;
+ALTER TABLE `message` ADD CONSTRAINT `message_fk0` FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE NO ACTION;
 
 ALTER TABLE `message` ADD CONSTRAINT `message_fk1` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`);
 
@@ -138,16 +140,16 @@ ALTER TABLE `review` ADD CONSTRAINT `review_fk0` FOREIGN KEY (`task_id`) REFEREN
 
 ALTER TABLE `review` ADD CONSTRAINT `review_fk1` FOREIGN KEY (`customer_id`) REFERENCES `user`(`id`);
 
-ALTER TABLE `review` ADD CONSTRAINT `review_fk2` FOREIGN KEY (`worker_id`) REFERENCES `user`(`id`) ON DELETE CASCADE;
+ALTER TABLE `review` ADD CONSTRAINT `review_fk2` FOREIGN KEY (`worker_id`) REFERENCES `user`(`id`) ON DELETE NO ACTION;
 
-ALTER TABLE `user_category` ADD CONSTRAINT `user_category_fk0` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE;
+ALTER TABLE `user_category` ADD CONSTRAINT `user_category_fk0` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE NO ACTION;
 
-ALTER TABLE `user_category` ADD CONSTRAINT `user_category_fk1` FOREIGN KEY (`category_id`) REFERENCES `category`(`id`) ON DELETE CASCADE;
+ALTER TABLE `user_category` ADD CONSTRAINT `user_category_fk1` FOREIGN KEY (`category_id`) REFERENCES `category`(`id`) ON DELETE NO ACTION;
 
-ALTER TABLE `favorite` ADD CONSTRAINT `favorite_fk0` FOREIGN KEY (`customer_id`) REFERENCES `user`(`id`) ON DELETE CASCADE;
+ALTER TABLE `favorite` ADD CONSTRAINT `favorite_fk0` FOREIGN KEY (`customer_id`) REFERENCES `user`(`id`) ON DELETE NO ACTION;
 
-ALTER TABLE `favorite` ADD CONSTRAINT `favorite_fk1` FOREIGN KEY (`worker_id`) REFERENCES `user`(`id`) ON DELETE CASCADE;
+ALTER TABLE `favorite` ADD CONSTRAINT `favorite_fk1` FOREIGN KEY (`worker_id`) REFERENCES `user`(`id`) ON DELETE NO ACTION;
 
-ALTER TABLE `file` ADD CONSTRAINT `file_fk0` FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE;
+ALTER TABLE `file` ADD CONSTRAINT `file_fk0` FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE NO ACTION;
 
-ALTER TABLE `portfolio` ADD CONSTRAINT `portfolio_fk0` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE;
+ALTER TABLE `portfolio` ADD CONSTRAINT `portfolio_fk0` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE NO ACTION;
